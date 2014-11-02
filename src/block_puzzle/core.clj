@@ -34,10 +34,9 @@
                     (assoc zero-vec i -1))))
           (map vector (range) (last-direction path))))))
 
-(defn moves
-  "All moves from position, even if not valid."
-  [{:keys [path remaining] :as puzzle-state}]
-  )
+(defn scale
+  [v n]
+  (mapv (partial * n) v))
 
 (defn dimension-span-ok?
   "Check that span of blocks in any direction is < 5"
@@ -48,20 +47,25 @@
        (count)
        (> 5)))
 
-(defn valid-move?
+(defn valid-path?
   "Checks to make sure move is a valid one."
-  [{:keys [path] :as puzzle-state}]
+  [path]
   ; Make sure we haven't overlapped any blocks
   (and (= (count path)
           (count (set path)))
        ; make sure we don't span more than 4 in any direction
        (every? (partial dimension-span-ok? path) (range 3))))
-            
-(defn valid-moves
-  "All valid moves from the given puzzle state."
-  [puzzle-state]
-  (filter valid-move? (moves puzzle-state)))
 
+(defn valid-moves
+  "All moves from position, even if not valid."
+  [{:keys [path remaining] :as puzzle-state}]
+  (->> (new-directions path)
+       (map
+         (fn [dir]
+           (concat path (map (partial scale) (range 1 (inc (first remaining)))))))
+       (filter valid-path?)
+       (hash-map :remaining (rest remaining) :path)))
+            
 (defn solution?
   "Returns true if the puzzle-state is a solution (has 0 remaining peices)."
   [puzzle-state]
