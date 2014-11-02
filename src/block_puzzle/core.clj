@@ -8,15 +8,31 @@
 ;(defrecord Path [points])
 ;(defrecord PuzzleState [path remaining])
 
+
+(defn penult
+  [xs]
+  (last (butlast xs)))
+
 (defn last-direction
   "Gives the last direction of the given path."
   [path]
-  )
+  (mapv - (penult path) (last path)))
 
 (defn new-directions
   "All movable directions given the current path."
   [path]
-  )
+  (case (count path)
+    0 [[1 0 0]]
+    1 [[0 1 0]]
+    2 [[1 0 0] [-1 0 0] [0 0 1]]
+      (let [zero-vec [0 0 0]]
+        (reduce
+          (fn [dirs [i v]]
+            (when (zero? v)
+              (conj dirs
+                    (assoc zero-vec i  1)
+                    (assoc zero-vec i -1))))
+          (map vector (range) (last-direction path))))))
 
 (defn moves
   "All moves from position, even if not valid."
