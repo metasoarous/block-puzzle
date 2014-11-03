@@ -8,6 +8,11 @@
 ;(defrecord Path [points])
 ;(defrecord PuzzleState [path remaining])
 
+(defn trace
+  [x]
+  (println x)
+  x)
+
 
 (defn penult
   [xs]
@@ -39,18 +44,20 @@
 (defn dimension-span-ok?
   "Check that span of blocks in any direction is < 5"
   [path dim]
+  (trace
   (->> path
        (map #(get % dim))
        (set)
        (count)
        (> 5)))
+  )
 
 (defn valid-path?
   "Checks to make sure move is a valid one."
   [path]
   ; Make sure we haven't overlapped any blocks
-  (and (= (count path)
-          (count (set path)))
+  (and (= (trace (count path))
+          (trace (count (set path))))
        ; make sure we don't span more than 4 in any direction
        (every? (partial dimension-span-ok? path) (range 3))))
 
@@ -65,20 +72,25 @@
                      (partial scale)
                      (range 1 (inc (first remaining)))))))
        (filter valid-path?)
-       (hash-map :remaining (rest remaining) :path)))
-            
+       (map (partial assoc {:remaining (rest remaining)} :path))))
+
+
+(valid-moves {:path [] :remaining [1 2 3]})
+
 (defn solution?
   "Returns true if the puzzle-state is a solution (has 0 remaining peices)."
   [{:keys [remaining] :as puzzle-state}]
-  (= (count remaining) 0))
+  (zero? (count remaining)))
 
 (defn puzzle-solutions
   "Returns all solutions to the given puzzle."
   [puzzle]
   (->> {:path [] :remaining puzzle}
+       (trace)
        (tree-seq
          (comp not solution?)
          valid-moves)
+       (trace)
        (filter solution?)))
 
 
