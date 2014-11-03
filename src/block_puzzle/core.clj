@@ -21,18 +21,16 @@
 (defn new-directions
   "All movable directions given the current path."
   [path]
-  (case (count path)
-    0 [[1 0 0]]
-    1 [[0 1 0]]
-    2 [[1 0 0] [-1 0 0] [0 0 1]]
-      (let [zero-vec [0 0 0]]
-        (reduce
-          (fn [dirs [i v]]
-            (when (zero? v)
-              (conj dirs
-                    (assoc zero-vec i  1)
-                    (assoc zero-vec i -1))))
-          (map vector (range) (last-direction path))))))
+  (let [zero-vec [0 0 0]]
+    (reduce
+      (fn [dirs [i v]]
+        (if (zero? v)
+          (conj dirs
+                (assoc zero-vec i  1)
+                (assoc zero-vec i -1))
+          dirs))
+      []
+      (map vector (range) (last-direction path)))))
 
 (defn scale
   [v n]
@@ -42,7 +40,7 @@
   "Check that span of blocks in any direction is < 5"
   [path dim]
   (->> path
-       (map %(get % dim))
+       (map #(get % dim))
        (set)
        (count)
        (> 5)))
@@ -62,14 +60,17 @@
   (->> (new-directions path)
        (map
          (fn [dir]
-           (concat path (map (partial scale) (range 1 (inc (first remaining)))))))
+           (concat path
+                   (map
+                     (partial scale)
+                     (range 1 (inc (first remaining)))))))
        (filter valid-path?)
        (hash-map :remaining (rest remaining) :path)))
             
 (defn solution?
   "Returns true if the puzzle-state is a solution (has 0 remaining peices)."
-  [puzzle-state]
-  (= (count (:remaining puzzle-state)) 0))
+  [{:keys [remaining] :as puzzle-state}]
+  (= (count remaining) 0))
 
 (defn puzzle-solutions
   "Returns all solutions to the given puzzle."
@@ -84,10 +85,10 @@
 (defn -main
   "Solve puzzle. Optionally, take only n items from the puzzle list and solve for those."
   [& [n]]
-  (let [puzzle (if n (take n the-puzzle) the-puzzle)
+  (let [puzzle (if n (take (Integer/parseInt n) the-puzzle) the-puzzle)
         solutions (puzzle-solutions puzzle)]
-    ;(doseq [solution solutions]
-      ;(println solution))
+    (doseq [solution solutions]
+      (println solution))
     (println "Solutions found:" (count solutions))))
 
 
