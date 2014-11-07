@@ -26,16 +26,23 @@
 (defn new-directions
   "All movable directions given the current path."
   [path]
-  (let [zero-vec [0 0 0]]
-    (reduce
-      (fn [dirs [i v]]
-        (if (zero? v)
-          (conj dirs
-                (assoc zero-vec i  1)
-                (assoc zero-vec i -1))
-          dirs))
-      []
-      (map vector (range) (last-direction path)))))
+  (case (count path)
+    ; no moves yet
+    0 [[1 0 0]]
+    ; only one move has been made - XXX hack! in the general puzzle case, we would have
+    ;   to know HOW MANY MOVES had been made, not just how many pecies
+    2 [[0 1 0]]
+    ; some number moves more have been made
+    (let [zero-vec [0 0 0]]
+      (reduce
+        (fn [dirs [i v]]
+          (if (zero? v)
+            (conj dirs
+                  (assoc zero-vec i  1)
+                  (assoc zero-vec i -1))
+            dirs))
+        []
+        (map vector (range) (last-direction path))))))
 
 (defn scale
   [v n]
