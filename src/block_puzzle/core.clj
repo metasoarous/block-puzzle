@@ -41,6 +41,10 @@
   [v n]
   (mapv (partial * n) v))
 
+(defn v+
+  [v w]
+  (mapv + v w))
+
 (defn dimension-span-ok?
   "Check that span of blocks in any direction is < 5"
   [path dim]
@@ -67,7 +71,9 @@
          (fn [dir]
            (concat path
                    (map
-                     (partial scale)
+                     (comp
+                       (partial v+ (last path))
+                       (partial scale dir))
                      (range 1 (inc (first remaining)))))))
        (filter valid-path?)
        (map (partial assoc {:remaining (rest remaining)} :path))))
