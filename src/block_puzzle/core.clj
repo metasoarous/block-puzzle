@@ -44,20 +44,18 @@
 (defn dimension-span-ok?
   "Check that span of blocks in any direction is < 5"
   [path dim]
-  (trace
   (->> path
        (map #(get % dim))
        (set)
        (count)
        (> 5)))
-  )
 
 (defn valid-path?
   "Checks to make sure move is a valid one."
   [path]
   ; Make sure we haven't overlapped any blocks
-  (and (= (trace (count path))
-          (trace (count (set path))))
+  (and (= (count path)
+          (count (set path)))
        ; make sure we don't span more than 4 in any direction
        (every? (partial dimension-span-ok? path) (range 3))))
 
@@ -86,11 +84,9 @@
   "Returns all solutions to the given puzzle."
   [puzzle]
   (->> {:path [] :remaining puzzle}
-       (trace)
        (tree-seq
          (comp not solution?)
          valid-moves)
-       (trace)
        (filter solution?)))
 
 
