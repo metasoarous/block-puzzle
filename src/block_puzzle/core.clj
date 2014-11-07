@@ -78,9 +78,6 @@
        (filter valid-path?)
        (map (partial assoc {:remaining (rest remaining)} :path))))
 
-
-(valid-moves {:path [] :remaining [1 2 3]})
-
 (defn solution?
   "Returns true if the puzzle-state is a solution (has 0 remaining peices)."
   [{:keys [remaining] :as puzzle-state}]
