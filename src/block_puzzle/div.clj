@@ -29,5 +29,11 @@
     divisors n))
 
 (divisors 6)
-(divisors-tree 6)
+(divisors-tree 12)
+
+(tree-seq
+  #(> (count %) 1)
+  #(vector [(first %)] (rest %))
+  [1 2 3 4 5 6 7])
+
 
