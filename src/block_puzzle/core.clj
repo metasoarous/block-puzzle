@@ -79,11 +79,14 @@
            (concat path
                    (map
                      (comp
-                       (partial v+ (last path))
+                       (partial v+ (or (last path) [0 0 0]))
                        (partial scale dir))
                      (range 1 (inc (first remaining)))))))
        (filter valid-path?)
        (map (partial assoc {:remaining (rest remaining)} :path))))
+
+(-> {:path [] :remaining [2 3 1 1]}
+    valid-moves)
 
 (defn solution?
   "Returns true if the puzzle-state is a solution (has 0 remaining peices)."
